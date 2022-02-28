@@ -53,8 +53,8 @@ jobs:
 
           echo ::set-output name=shield-arg::${SHIELD_ARG}
           echo ::set-output name=artifact-name::${ARTIFACT_NAME}
-      - name: Update pin
-        run: sed -i 's/gpio0 3  GPIO_ACTIVE_HIGH/gpio0 21  GPIO_ACTIVE_HIGH/g' zmk/app/boards/arm/nice60/nice60.dts
+      - name: Update dts
+        run: cp ${GITHUB_WORKSPACE}/config/nice60.dts zmk/app/boards/arm/nice60/nice60.dts
       - name: Build (west build)
         run: west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }}
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
