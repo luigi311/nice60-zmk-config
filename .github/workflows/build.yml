@@ -1,9 +1,6 @@
-name: Reusable user config build
+name: build
+
 on:
-  push:
-  pull_request:
-  workflow_dispatch:
-  
   workflow_call:
     inputs:
       build_matrix_path:
@@ -28,35 +25,16 @@ on:
         type: string
 
 jobs:
-  matrix:
-    runs-on: ubuntu-latest
-    name: Fetch Build Keyboards
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Install yaml2json
-        run: python3 -m pip install remarshal
-
-      - name: Fetch Build Matrix
-        id: set-matrix
-        run: |
-          set -x
-          matrix=$(yaml2json ${{ inputs.build_matrix_path }} | jq -c .)
-          yaml2json ${{ inputs.build_matrix_path }}
-          echo "::set-output name=matrix::${matrix}"
-
   build:
     runs-on: ubuntu-latest
     container:
       image: zmkfirmware/zmk-build-arm:stable
-    needs: matrix
     name: Build
     strategy:
       fail-fast: false
-      matrix: ${{fromJson(needs.matrix.outputs.matrix)}}
+      matrix: 
+        include:
+          - board: nice60
     steps:
       - name: Prepare variables
         id: variables
